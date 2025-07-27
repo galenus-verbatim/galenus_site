@@ -31,7 +31,10 @@ class Tei2split extends AbstractTei2
     static public function toURI(DOMDocument $dom, string $dst_dir, ?array $pars=array())
     {
         if (!$pars) $pars = array();
-        $dst_dir = Filesys::cleandir($dst_dir) . "/";
+		if (!Filesys::isabs($dst_dir)) $dst_dir = getcwd() . "/" . $dst_dir;
+		$dst_dir = Filesys::pathnorm($dst_dir) . "/";
+        // do not clean dir here
+        Filesys::mkdir($dst_dir);
         if (DIRECTORY_SEPARATOR == "\\") {
             $dst_dir = "file:///" . str_replace('\\', '/', $dst_dir);
         }

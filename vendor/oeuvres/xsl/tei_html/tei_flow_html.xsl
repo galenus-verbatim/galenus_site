@@ -118,11 +118,10 @@ Sections
     <xsl:param name="from"/>
     <xsl:param name="level" select="count(ancestor::*) - 2"/>
     <section>
-      <xsl:attribute name="id">
-        <xsl:call-template name="id"/>
-      </xsl:attribute>
+      <!-- do not identify section, but titles -->
       <xsl:call-template name="atts">
-        <xsl:with-param name="class">
+        <xsl:with-param name="rend">
+          <xsl:value-of select="@rend"/>
           level<xsl:value-of select="$level + 1"/>
           <xsl:if test="@type = 'act' and $verse"> verse</xsl:if>
         </xsl:with-param>
@@ -207,22 +206,21 @@ Sections
         or self::tei:salute
         or self::tei:signed
         ]">
-        <xsl:text> </xsl:text>
         <header>
           <xsl:apply-templates select="$first/preceding-sibling::node()">
             <xsl:with-param name="level" select="$level"/>
             <xsl:with-param name="from" select="$from"/>
           </xsl:apply-templates>
         </header>
-        <xsl:text>&#10;</xsl:text>
+        <!-- Do no insert spacing here, this will break auto indent -->
         <xsl:apply-templates select="$first | $first/following-sibling::node()">
-          <xsl:with-param name="level" select="$level + 1"/>
+          <xsl:with-param name="level" select="$level"/>
           <xsl:with-param name="from" select="$from"/>
         </xsl:apply-templates>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates>
-          <xsl:with-param name="level" select="$level + 1"/>
+          <xsl:with-param name="level" select="$level"/>
           <xsl:with-param name="from" select="$from"/>
         </xsl:apply-templates>
       </xsl:otherwise>
@@ -284,10 +282,9 @@ Sections
   <xsl:template match="tei:head">
     <xsl:param name="from"/>
     <xsl:param name="level" select="count(ancestor::*[tei:head])"/>
+    <!-- get a slug for an idea -->
     <xsl:variable name="id">
-      <xsl:for-each select="parent::*">
-        <xsl:call-template name="id"/>
-      </xsl:for-each>
+      <xsl:apply-templates select="." mode="id"/>
     </xsl:variable>
     <xsl:variable name="name">
       <xsl:choose>
@@ -303,11 +300,16 @@ Sections
       <xsl:apply-templates select="tei:pb"/>
       <xsl:element name="{$name}" namespace="http://www.w3.org/1999/xhtml">
         <xsl:call-template name="atts">
-          <xsl:with-param name="class">
+          <xsl:with-param name="rend">
+            <xsl:value-of select="@rend"/>
+            <xsl:if test="$verse"> verse </xsl:if>
             <xsl:value-of select="../@type"/>
-            <xsl:if test="$verse"> verse</xsl:if>
           </xsl:with-param>
         </xsl:call-template>
+        <xsl:attribute name="id">
+          <xsl:value-of select="$id"/>
+        </xsl:attribute>
+        <xsl:attribute name="tabindex">-1</xsl:attribute>
         <xsl:for-each select="preceding-sibling::tei:head[1][@type = 'kicker']">
           <xsl:apply-templates/>
           <br/>
@@ -315,9 +317,7 @@ Sections
         <xsl:apply-templates select="node()[not(self::tei:pb)]">
           <xsl:with-param name="from" select="$from"/>
         </xsl:apply-templates>
-        <a class="bookmark" href="#{$id}">
-          <xsl:text> </xsl:text>
-        </a>
+        <a class="bookmark" aria-hidden="true" href="#{$id}">🔗</a>
       </xsl:element>
     </xsl:if>
   </xsl:template>
@@ -431,19 +431,19 @@ Sections
     <xsl:element name="{$el}">
       <xsl:variable name="prev" select="preceding-sibling::*[not(self::tei:pb)][not(self::tei:cb)][1]"/>
       <xsl:variable name="char1" select="substring( normalize-space(.), 1, 1)"/>
-      <xsl:variable name="class">
-        <xsl:variable name="noindent">
-          <xsl:call-template name="noindent"/>
-        </xsl:variable>
-        <xsl:if test="$noindent != ''"> noindent </xsl:if>
-        <xsl:if test="@n"> no</xsl:if>
-        <xsl:if test="tei:hi[contains(@rend, 'initial')]">
-          <xsl:text> </xsl:text>
-          <xsl:value-of select="tei:hi[starts-with(@rend, 'initial')]/@rend"/>
-        </xsl:if>
-      </xsl:variable>
       <xsl:call-template name="atts">
-        <xsl:with-param name="class" select="$class"/>
+        <xsl:with-param name="rend">
+          <xsl:value-of select="@rend"/>
+          <xsl:variable name="noindent">
+            <xsl:call-template name="noindent"/>
+          </xsl:variable>
+          <xsl:if test="$noindent != ''"> noindent </xsl:if>
+          <xsl:if test="@n"> no</xsl:if>
+          <xsl:if test="tei:hi[contains(@rend, 'initial')]">
+            <xsl:text> </xsl:text>
+            <xsl:value-of select="tei:hi[starts-with(@rend, 'initial')]/@rend"/>
+          </xsl:if>
+        </xsl:with-param>
       </xsl:call-template>
       <xsl:if test="@n">
         <small class="no">
@@ -519,8 +519,9 @@ Sections
       <xsl:otherwise>
         <div>
           <xsl:call-template name="atts">
-            <xsl:with-param name="class">
-              <xsl:if test="substring(normalize-space(.), 1, 1) = '*'">star</xsl:if>
+            <xsl:with-param name="rend">
+              <xsl:value-of select="@rend"/>
+              <xsl:if test="substring(normalize-space(.), 1, 1) = '*'"> star</xsl:if>
             </xsl:with-param>
           </xsl:call-template>
           <xsl:apply-templates>
@@ -566,8 +567,9 @@ Sections
           </xsl:apply-templates>
           <xsl:element name="{$el}" namespace="http://www.w3.org/1999/xhtml">
             <xsl:call-template name="atts">
-              <xsl:with-param name="class">
-                <xsl:if test="$none">none</xsl:if>
+              <xsl:with-param name="rend">
+                <xsl:value-of select="@rend"/>
+                <xsl:if test="$none"> none</xsl:if>
               </xsl:with-param>
             </xsl:call-template>
             <xsl:apply-templates select="*[local-name() != 'head']">
@@ -579,8 +581,9 @@ Sections
       <xsl:otherwise>
         <xsl:element name="{$el}" namespace="http://www.w3.org/1999/xhtml">
           <xsl:call-template name="atts">
-            <xsl:with-param name="class">
-              <xsl:if test="$none">none</xsl:if>
+            <xsl:with-param name="rend">
+              <xsl:value-of select="@rend"/>
+              <xsl:if test="$none"> none</xsl:if>
               <xsl:text> </xsl:text>
               <!-- bad TEI practice, from odt/tei with  -->
               <xsl:value-of select="tei:item[1]/@rend"/>
@@ -768,9 +771,7 @@ Sections
       </xsl:when>
       <xsl:otherwise>
         <dl>
-          <xsl:call-template name="atts">
-            <xsl:with-param name="class">dl</xsl:with-param>
-          </xsl:call-template>
+          <xsl:call-template name="atts"/>
           <xsl:apply-templates>
             <xsl:with-param name="from" select="$from"/>
           </xsl:apply-templates>
@@ -868,8 +869,13 @@ Tables
     <xsl:param name="from"/>
     <table>
       <xsl:call-template name="atts">
-        <xsl:with-param name="class">
-          <xsl:if test="not(@rend)">table</xsl:if>
+        <xsl:with-param name="rend">
+          <xsl:choose>
+            <xsl:when test="@rend">
+              <xsl:value-of select="@rend"/>
+            </xsl:when>
+            <xsl:otherwise>table</xsl:otherwise>
+          </xsl:choose>
         </xsl:with-param>
       </xsl:call-template>
       <xsl:apply-templates>
@@ -942,9 +948,10 @@ Tables
     <xsl:param name="from"/>
     <div>
       <xsl:call-template name="atts">
-        <xsl:with-param name="class">
+        <xsl:with-param name="rend">
+          <xsl:value-of select="@rend"/>
           <xsl:if test="@part">
-            <xsl:text>part-</xsl:text>
+            <xsl:text> part-</xsl:text>
             <xsl:value-of select="translate(@part, 'fimy', 'FIMY')"/>
           </xsl:if>
         </xsl:with-param>
@@ -982,9 +989,10 @@ Tables
             <xsl:number/>
           </xsl:variable>
           <xsl:call-template name="atts">
-            <xsl:with-param name="class">
+            <xsl:with-param name="rend">
+              <xsl:value-of select="@rend"/>
               <xsl:if test="@part">
-                <xsl:text>part-</xsl:text>
+                <xsl:text> part-</xsl:text>
                 <xsl:value-of select="translate(@part, 'fimy', 'FIMY')"/>
               </xsl:if>
               <xsl:if test="@met">
@@ -1060,9 +1068,8 @@ Tables
     </xsl:choose>
   </xsl:template>
   <!--
-<h2>Caractères</h2>
+<h2>Char level</h2>
 
-<p>Balises de niveau mot, à l'intérieur d'un paragraphe.</p>
 
 <h3>HTML</h3>
 
@@ -1074,23 +1081,17 @@ Tables
     <xsl:choose>
       <xsl:when test=". =''"/>
       <!-- si @rend est un nom d'élément HTML -->
-      <xsl:when test="contains( ' b big em i s small strike strong sub sup tt u ', concat(' ', $rend, ' '))">
+      <xsl:when test="contains( ' b big em i s small strike strong sub sup tt u var ', concat(' ', $rend, ' '))">
         <xsl:element name="{$rend}" namespace="http://www.w3.org/1999/xhtml">
-          <xsl:call-template name="atts"/>
+          <xsl:call-template name="atts">
+            <xsl:with-param name="rend"/>
+          </xsl:call-template>
           <xsl:apply-templates>
             <xsl:with-param name="from" select="$from"/>
           </xsl:apply-templates>
         </xsl:element>
       </xsl:when>
-      <xsl:when test="contains($rend, 'initial')">
-        <span>
-          <xsl:call-template name="atts"/>
-          <xsl:apply-templates>
-            <xsl:with-param name="from" select="$from"/>
-          </xsl:apply-templates>
-        </span>
-      </xsl:when>
-      <xsl:when test="$rend = ''">
+      <xsl:when test="not(@rend) or $rend = ''">
         <i>
           <xsl:call-template name="atts"/>
           <xsl:apply-templates>
@@ -1122,14 +1123,6 @@ Tables
           </xsl:apply-templates>
         </sub>
       </xsl:when>
-      <xsl:when test="starts-with($rend, 'sc')">
-        <span rend="sc">
-          <xsl:call-template name="atts"/>
-          <xsl:apply-templates>
-            <xsl:with-param name="from" select="$from"/>
-          </xsl:apply-templates>
-        </span>
-      </xsl:when>
       <xsl:when test="starts-with($rend, 'exp')">
         <sup>
           <xsl:call-template name="atts"/>
@@ -1137,6 +1130,16 @@ Tables
             <xsl:with-param name="from" select="$from"/>
           </xsl:apply-templates>
         </sup>
+      </xsl:when>
+      <xsl:when test="starts-with($rend, 'var')">
+        <var>
+          <xsl:call-template name="atts">
+            <xsl:with-param name="rend" select="substring-after($rend, 'var')"/>
+          </xsl:call-template>
+          <xsl:apply-templates>
+            <xsl:with-param name="from" select="$from"/>
+          </xsl:apply-templates>
+        </var>
       </xsl:when>
       <!-- generated from docx, keep it ? -->
       <xsl:when test="contains($rend, 'bg_')">
@@ -1152,14 +1155,22 @@ Tables
           </xsl:apply-templates>
         </span>
       </xsl:when>
-      <!-- maybe tei genrated from html mess, thing like <i rend="t15"></i> -->
-      <xsl:otherwise>
-        <i>
+      <xsl:when test="contains($rend, 'initial') or starts-with($rend, 'over') or starts-with($rend, 'sc') or starts-with($rend, 'under')">
+        <span>
           <xsl:call-template name="atts"/>
           <xsl:apply-templates>
             <xsl:with-param name="from" select="$from"/>
           </xsl:apply-templates>
-        </i>
+        </span>
+      </xsl:when>
+      <!-- maybe tei generated from html mess, thing like <i rend="t15"></i> -->
+      <xsl:otherwise>
+        <span>
+          <xsl:call-template name="atts"/>
+          <xsl:apply-templates>
+            <xsl:with-param name="from" select="$from"/>
+          </xsl:apply-templates>
+        </span>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -1195,6 +1206,32 @@ Tables
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template match="tei:formula">
+    <xsl:param name="from"/>
+    <xsl:variable name="inline">
+      <xsl:call-template name="tei:isInline"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$inline != ''">
+        <span>
+          <xsl:call-template name="atts"/>
+          <xsl:apply-templates>
+            <xsl:with-param name="from" select="$from"/>
+          </xsl:apply-templates>
+        </span>
+      </xsl:when>
+      <xsl:otherwise>
+        <p>
+          <xsl:call-template name="atts"/>
+          <xsl:apply-templates>
+            <xsl:with-param name="from" select="$from"/>
+          </xsl:apply-templates>
+        </p>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <!--
     use the @scheme for a link ? TEI, Docbook…
 
@@ -1267,7 +1304,7 @@ Tables
         <xsl:if test="$mixed != ''">
           <xsl:value-of select="$lf"/>
         </xsl:if>
-        <a class="{normalize-space($class)}">
+        <a class="{normalize-space($class)}" role="doc-pagebreak" aria-hidden="true" tabindex="-1">
           <xsl:choose>
             <!-- @xml:base ? -->
             <xsl:when test="@facs">
@@ -1521,12 +1558,12 @@ Tables
       <!-- bad link pb, seen in notes -->
       <xsl:when test="normalize-space($html) = ''"/>
       <xsl:otherwise>
-        <xsl:variable name="class">
-          <xsl:if test="starts-with(@target, 'http')">external</xsl:if>
-        </xsl:variable>
         <a>
           <xsl:call-template name="atts">
-            <xsl:with-param name="class" select="$class"/>
+            <xsl:with-param name="rend">
+              <xsl:value-of select="@rend"/>
+              <xsl:if test="starts-with(@target, 'http')"> external</xsl:if>
+            </xsl:with-param>
           </xsl:call-template>
           <xsl:copy-of select="$html"/>
         </a>
@@ -2106,7 +2143,10 @@ Elements block or inline level
       <xsl:when test="@corresp and contains(@type, 'embed')">
         <figure>
           <xsl:call-template name="atts">
-            <xsl:with-param name="class">corresp</xsl:with-param>
+            <xsl:with-param name="rend">
+              <xsl:value-of select="@rend"/>
+              <xsl:text> corresp</xsl:text>
+            </xsl:with-param>
           </xsl:call-template>
           <figcaption>
             <xsl:call-template name="atts"/>
@@ -2122,16 +2162,17 @@ Elements block or inline level
       <xsl:otherwise>
         <xsl:variable name="el">
           <xsl:choose>
-            <xsl:when test="self::tei:label and parent::tei:figure">div</xsl:when>
+            <xsl:when test="self::tei:label and parent::tei:figure">figcaption</xsl:when>
             <xsl:when test="self::tei:label">p</xsl:when>
             <xsl:when test="self::tei:q">blockquote</xsl:when>
             <xsl:when test="self::tei:quote">blockquote</xsl:when>
-            <xsl:otherwise>div</xsl:otherwise>
+            <xsl:otherwise>p</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
         <xsl:element name="{$el}" namespace="http://www.w3.org/1999/xhtml">
           <xsl:call-template name="atts">
-            <xsl:with-param name="class">
+            <xsl:with-param name="rend">
+              <xsl:value-of select="@rend"/>
               <xsl:if test="@corresp"> corresp</xsl:if>
             </xsl:with-param>
           </xsl:call-template>
@@ -2245,16 +2286,10 @@ Elements block or inline level
         </xsl:variable>
         <span>
           <xsl:call-template name="atts">
-            <xsl:with-param name="class">
-              <xsl:value-of select="translate($key, $idfrom, $idto)"/>
+            <xsl:with-param name="rend">
+              <xsl:value-of select="@rend"/>
             </xsl:with-param>
           </xsl:call-template>
-          <xsl:attribute name="data-key">
-            <xsl:value-of select="translate($key, $idfrom, $idto)"/>
-          </xsl:attribute>
-          <xsl:attribute name="id">
-            <xsl:call-template name="id"/>
-          </xsl:attribute>
           <xsl:apply-templates/>
         </span>
       </xsl:otherwise>
@@ -2267,10 +2302,10 @@ Centralize some html attribute policy, especially for id, and class
   -->
   <xsl:template name="atts">
     <!-- Add some html classes to the automatic ones -->
-    <xsl:param name="class"/>
+    <xsl:param name="rend" select="@rend"/>
     <!-- Ddelegate class attribution to another template -->
     <xsl:call-template name="class">
-      <xsl:with-param name="class" select="$class"/>
+      <xsl:with-param name="rend" select="$rend"/>
     </xsl:call-template>
     <!-- Shall we identify element ? -->
     <xsl:choose>
@@ -2302,11 +2337,13 @@ Centralize some html attribute policy, especially for id, and class
   </xsl:template>
   <!-- Provide automatic classes from TEI names -->
   <xsl:template name="class">
-    <xsl:param name="class"/>
+    <xsl:param name="rend" select="@rend"/>
     <!-- @rend may be used as a free text attribute, be careful -->
     <xsl:variable name="value">
+      <xsl:value-of select="$rend"/>
       <!-- Name of the element (except from a list where TEI info will be redundant with HTML name) -->
-      <xsl:if test="not(contains( ' abbr add cell code del eg emph hi item list q ref row seg table ' , concat(' ', local-name(), ' ')))">
+      <xsl:if test="not(contains( ' abbr add code del emph hi q ref row seg ' , concat(' ', local-name(), ' ')))">
+        <xsl:text> </xsl:text>
         <xsl:value-of select="local-name()"/>
       </xsl:if>
       <xsl:text> </xsl:text>
@@ -2325,11 +2362,6 @@ Centralize some html attribute policy, especially for id, and class
       <xsl:text> </xsl:text>
       <!-- lang is a useful class for some rendering (ex: greek fonts) -->
       <xsl:value-of select="@xml:lang"/>
-      <xsl:text> </xsl:text>
-      <!-- parameter value -->
-      <xsl:value-of select="$class"/>
-      <xsl:text> </xsl:text>
-      <xsl:value-of select="@rend"/>
       <xsl:text> </xsl:text>
       <xsl:value-of select="translate(@rendition, '#', '')"/>
     </xsl:variable>

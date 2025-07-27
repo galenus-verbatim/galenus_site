@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Oeuvres\Teinte\Format;
 
-use Exception, DOMDocument, DOMXpath;
+use Exception, DOMDocument, DOMNode, DOMXpath;
 use Oeuvres\Kit\{Filesys,Log, Xt};
 use Oeuvres\Teinte\Tei2\{AbstractTei2};
 
@@ -22,6 +22,45 @@ use Oeuvres\Teinte\Tei2\{AbstractTei2};
 class Tei extends File
 {
     use Teiable;
+    const BLOCKS = [
+        "ab"=>true,
+        "bibl"=>true,
+        "byline"=>true,
+        "castList"=>true,
+        "cit"=>true,
+        "desc"=>true,
+        "eg"=>true,
+        "dateline"=>true,
+        "entryFree"=>true,
+        "epigraph"=>true,
+        "figure"=>true,
+        "fw"=>true,
+        "l"=>true,
+        "label"=>true,
+        "list"=>true,
+        "listBibl"=>true,
+        "lg"=>true,
+        "p"=>true,
+        "q"=>true,
+        "quote"=>true,
+        "salute"=>true,
+        "signed"=>true,
+        "stage"=>true,
+        "sp"=>true,
+        "table"=>true,
+    ];
+    const DIVS = [
+        "div"=>true,
+        "div1"=>true,
+        "div2"=>true,
+        "div3"=>true,
+        "div4"=>true,
+        "div5"=>true,
+        "div6"=>true,
+        "div7"=>true,
+    ];
+
+
     /** Array of templates, registred by format when relevant */
     protected array $templates = [];
 
@@ -29,16 +68,17 @@ class Tei extends File
     /**
      * Load XML/TEI as a file (preferred way to hav some metas).
      */
-    public function open(string $src_file): bool
+    public function open(string $file): bool
     {
         $this->teiReset();
-        if (!parent::open($src_file)) {
+        if (!parent::open($file)) {
             // parent has return false, probably an error 
             return false;
         }
+        // shall we break or inform on malformed file ?
         $this->loadXML($this->contents());
         // set DocumentURI for xi:include resolution
-        $this->teiDOM->documentURI = "file:///" . str_replace('\\', '/', realpath($src_file));
+        $this->teiDOM->documentURI = "file:///" . str_replace('\\', '/', realpath($file));
         // inclusions done, XML has change
         if ($this->teiDOM->xinclude()) {
             $this->teiXML = $this->teiDOM->saveXML();
@@ -323,97 +363,56 @@ class Tei extends File
      * copy linked images in a flat img_dir
      * and modify relative link
      *
-     * $href_dir : a href prefix to redirest generated links
-     * $dst_dir : a folder if images should be copied
+     * $file_prefix : a prefix to build image file path
+     * $href_prefix : a prefix to build a href link from tei XML to image file
      * return : a doc with updated links to image
      */
-    public static function imagesCopy($doc, $img_dir = null, $img_href = null)
+    public static function imagesCopy($dom, $file_prefix, $href_prefix, $counter=false)
     {
-        if (!$doc->documentURI) {
+        if (!$dom->documentURI) {
             throw new Exception("DOMDocument has no documentURI property to resolve relative path to images");
         }
-        if ($doc->documentURI == getcwd()) {
+        if ($dom->documentURI == getcwd()) {
             throw new Exception("DOMDocument has no documentURI property to resolve relative path to images");
         }
-        if ($img_dir) {
-            $img_dir = rtrim($img_dir, '/\\') . '/';
-        }
-        if ($img_href) {
-            $img_href = rtrim($img_href, '/\\') . '/';
-        }
+        $dom_dir = dirname($dom->documentURI);
+        // do not normalize href or file prefix with a '/', caller should know
         $count = 1;
-        $nl = $doc->getElementsByTagNameNS('http://www.tei-c.org/ns/1.0', 'graphic');
-        $pad = strlen('' . $nl->count());
-        $found = false;
+        $nl = $dom->getElementsByTagNameNS('http://www.tei-c.org/ns/1.0', 'graphic');
+        $pad = strlen(strval($nl->count()));
+        $n = 0;
         foreach ($nl as $el) {
-            // create image directory only if an image is found
-            if (!$found) {
-                // do not clean dir here, tex resources may have 
-                Filesys::mkdir($img_dir);
-
+            $n++;
+            $att = $el->getAttributeNode("url");
+            if (!isset($att) || !$att || !$att->value) {
+                continue;
             }
-            self::graphic(
-                $el->getAttributeNode("url"), 
-                str_pad(strval($count), $pad, '0', STR_PAD_LEFT), 
-                $img_dir,
-                $img_href, 
-            );
-            $count++;
+            $url = $att->value;
+            if (strpos($url, 'http') === 0) {
+                // copy images from the internet ?
+                // continue;
+            }
+            $data = Filesys::loadURL($url, $dom_dir);
+            if (!$data) {
+                continue;
+            }
+            if ($counter) {
+                $img_filename = str_pad(strval($n), $pad, "0", STR_PAD_LEFT) . '.' . $data['ext'];
+            }
+            // preserve original filename, avoiding collisions
+            else {
+                $count = 2;
+                $img_filename = $data['name'] . '.' . $data['ext'];
+                while (file_exists($file_prefix . $img_filename)) {
+                    $img_filename = $data['name'] . $count . '.' . $data['ext'];
+                    $count++;
+                }
+            }
+            $img_file = $file_prefix . $img_filename;
+            Filesys::mkdir(dirname($img_file));
+            file_put_contents($img_file, $data['bytes']);
+            $el->setAttribute("url", $href_prefix . $img_filename);
         }
-        /*
-        do not store images of pages, especially in tif
-        foreach ($doc->getElementsByTagNameNS('http://www.tei-c.org/ns/1.0', 'pb') as $el) {
-        $this->img($el->getAttributeNode("facs"), $hrefTei, $dstdir, $hrefSqlite);
-        }
-        */
-    }
-    /**
-     * Process one image
-     */
-    private static function graphic($att, $count, $img_dir = "", $img_href = "")
-    {
-        $doc_dir = dirname($att->ownerDocument->documentURI);
-        $doc_name = strtok(pathinfo($att->ownerDocument->documentURI, PATHINFO_FILENAME), '_');
-        if (!isset($att) || !$att || !$att->value) {
-            return;
-        }
-        $src = $att->value;
-        // do not modify data image
-        if (strpos($src, 'data:image') === 0) {
-            return;
-        }
-        // if coming from the internet, keep full url
-        if (substr($src, 0, 4) == 'http') {
-
-        }
-        else if (realpath($src)) {
-            $src = realpath($src);
-        }
-        // test if relative file path
-        else if (file_exists("$doc_dir/$src")) {
-            $src = "$doc_dir/$src";
-        }
-        // if not file exists, escape and alert (?)
-        else if (!file_exists($src)) {
-            Log::warning("Image not found: " . $src);
-            return;
-        }
-        $srcparts = pathinfo($src);
-        // if image name starts by filename, keep it as is
-        // probably thought to be unique for file
-        if (substr($srcparts['filename'], 0, strlen($doc_name)) !== $doc_name) {
-            $srcparts['filename'] = $doc_name . '_' . $count;
-        }
-        // test first if dst dir provides for copy
-        if (isset($img_dir)) {
-            Filesys::mkdir($img_dir);
-            $dst = $img_dir . $srcparts['filename'] . '.' . $srcparts['extension'];
-            if (!copy($src, $dst)) return false; // bad copy
-        }
-        // changes links in TEI so that straight transform will point on the right files
-        $att->value = $img_href . $srcparts['filename'] . '.' . $srcparts['extension'];
-        // resize image before copy ?
-        // NO delete of <graphic> element if broken link
     }
 }
 

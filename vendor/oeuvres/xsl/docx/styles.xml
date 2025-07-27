@@ -32,48 +32,41 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   >
 ]>
 <sheet xmlns="https://github.com/oeuvres/teinte_xsl">
+    
   <!-- styles to filter -->
+  <style level="0" name="aucun"/>
   <style level="0" name="ancredenotedebasdepage"/>
   <style level="0" name="ancredenotedefin"/>
+  <style level="0" name="annotationreference"/>
   <style level="0" name="appelnotedebasdep"/>
   <style level="0" name="appeldenotedefin"/>
   <style level="0" name="autres"/>
+  <style level="0" name="bodytext"/>
   <style level="0" name="caracteresdenotedebasdepage"/>
   <style level="0" name="caracteresdenotedefin"/>
-  <style level="0" name="bodytext"/>
+  <style level="0" name="corps"/>
   <style level="0" name="corpsdetexte"/>
-  <style level="0" name="corpsdetexte1"/>
-  <style level="0" name="corpsdetexte2"/>
-  <style level="0" name="corpsdetexte3"/>
+  <style level="0" name="corpsdutexte"/>
   <style level="0" name="defaultparagraphfont"/>
+  <style level="0" name="footnotecharacters"/>
   <style level="0" name="footnotereference"/>
   <style level="0" name="freeform"/>
-  <style level="0" name="jjnormal"/>
-  <style level="0" name="jjnormalptsansretrait"/>
+  <style level="0" name="legendedelimage"/>
+  <style level="0" name="mcematchmarker"/>
   <style level="0" name="none"/>
   <style level="0" name="normal"/>
   <style level="0" name="normal1"/>
+  <style level="0" name="normalhtpage"/>
   <style level="0" name="notedebasdepage"/>
   <style level="0" name="notesdebasdepage"/>
   <style level="0" name="notedefin"/>
   <style level="0" name="notesdefin"/>
+  <style level="0" name="standard"/>
+  <style level="0" name="style"/>
+  <style level="0" name="tablecontents"/>
+  <style level="0" name="texte"/>
   <style level="0" name="texteducorps"/>
-  <style level="0" name="texteducorps0"/>
-  <style level="0" name="texteducorps1"/>
-  <style level="0" name="texteducorps2"/>
-  <style level="0" name="texteducorps3"/>
-  <style level="0" name="texteducorps4"/>
-  <style level="0" name="texteducorps5"/>
-  <style level="0" name="texteducorps6"/>
-  <style level="0" name="texteducorps7"/>
-  <style level="0" name="texteducorps8"/>
-  <style level="0" name="texteducorps9"/>
-  <style level="0" name="texteducorps10"/>
-  <style level="0" name="texteducorps11"/>
-  <style level="0" name="texteducorps20"/>
-  <style level="0" name="texteducorps30"/>
-  <style level="0" name="texteducorps40"/>
-  <style level="0" name="texteducorps50"/>
+  <style level="0" name="titrecar"/>
   <style level="0" name="titre1car"/>
   <style level="0" name="titre2car"/>
   <style level="0" name="titre3car"/>
@@ -85,11 +78,13 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="0" name="titre9car"/>
   <!-- styles paragraph level -->
   <style level="p" name="ab" element="ab" attribute="type" value="ornament" doc="true"/>
+  <style level="p" name="abstract" element="p" parent="argument" attribute="rend" value="abstract"/>
   <style level="p" name="address" element="addrLine" parent="address" doc="true"/>
   <style level="p" name="addrline" element="addrLine" parent="address"/>
   <style level="p" name="adcitationrom" element="p" parent="quote" rend="keep"/>
   <style level="p" name="adlocalcitationrom" element="p" parent="quote" rend="keep"/>
   <style level="p" name="adresume" element="p" parent="argument"/>
+  <style level="p" name="annotationtext" element="p" parent="quote" rend="keep" attribute="type" value="story"/>
   <style level="p" name="argument" element="p" parent="argument" doc="true"/>
   <style level="p" name="auteur" element="byline"/>
   <style level="p" name="author" element="byline"/>
@@ -101,6 +96,7 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="p" name="byline" element="byline" doc="true"/>
   <style level="p" name="camera" element="camera" doc="true"/>
   <style level="p" name="chant" element="l" attribute="type" value="chant"/>
+  <style level="p" name="chapo" element="p" parent="argument" attribute="type" value="chapo"/>
   <style level="p" name="caption" element="caption" doc="true"/>
   <style level="p" name="castitem" element="castItem" parent="castList" doc="true"/>
   <style level="p" name="castlist" element="castList" doc="true"/>
@@ -132,13 +128,17 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="p" name="epigraph" element="p" parent="epigraph" rend="keep" doc="true"/>
   <style level="p" name="epigraphl" element="l" parent="epigraph" doc="true"/>
   <style level="p" name="endnote" element="note"/>
+  <style level="p" name="enteteoupieddepage" element="fw"/>
   <style level="p" name="entry" element="entry" doc="true"/>
   <style level="p" name="espce" element="label" attribute="type" value="species"/>
   <style level="p" name="espece" element="label" attribute="type" value="species"/>
   <style level="p" name="exemple" element="quote" parent="entryFree"/>
   <style level="p" name="figure" element="figure"/>
   <style level="p" name="footnote" element="p"/><!-- in odt, used inside notes -->
+  <style level="p" name="footnotetext" element="note"/><!-- note as a block -->
   <style level="p" name="form" element="form" parent="entryFree"/>
+  <style level="p" name="formula" element="formula" doc="true"/>
+  <style level="p" name="formulapar" element="formula"/>
   <style level="p" name="fw" element="fw" doc="true"/>
   <style level="p" name="genre" element="label" attribute="type" value="genus"/>
   <style level="p" name="heading" element="label" attribute="type" value="head"/>
@@ -151,12 +151,13 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="p" name="h2sub" element="head" attribute="type" value="sub"/>
   <style level="p" name="h3sub" element="head" attribute="type" value="sub"/>
   <style level="p" name="h4sub" element="head" attribute="type" value="sub"/>
+  <style level="p" name="heading1" element="head" attribute="level" value="1"/>
+  <style level="p" name="heading2" element="head" attribute="level" value="2"/>
+  <style level="p" name="heading3" element="head" attribute="level" value="3"/>
+  <style level="p" name="heading4" element="head" attribute="level" value="4"/>
+  <style level="p" name="heading5" element="head" attribute="level" value="5"/>
+  <style level="p" name="heading6" element="head" attribute="level" value="6"/>
   <style level="p" name="index" element="item" parent="index" doc="true"/>
-  <style level="p" name="jjnormalpt" element="p" attribute="type" value="observation"/>
-  <style level="p" name="jjnote" element="note"/>
-  <style level="p" name="jjtitre" element="label" attribute="type" value="head"/>
-  <style level="p" name="jjcellule" element="p"/>
-  <style level="p" name="jjnormalcentre" element="label"/>
   <style level="p" name="l" element="l" rend="keep" doc="true"/>
   <style level="p" name="lindent" element="l" attribute="rend" value="indent"/>
   <style level="p" name="legend" element="legend"/>
@@ -175,8 +176,9 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="p" name="listcontents" element="item" parent="dl"/>
   <style level="p" name="lg" element="l" parent="lg" doc="true"/>
   <style level="p" name="note" element="p" parent="notep"/>
-  <style level="p" name="obs" element="p" parent="quote" rend="keep"/>
-  <style level="p" name="observation" element="p" parent="quote" rend="keep"/>
+  <style level="p" name="obs" element="p" parent="quote" rend="keep" attribute="type" value="observation"/>
+  <style level="p" name="observation" element="p" parent="quote" rend="keep" attribute="type" value="observation"/>
+  <style level="p" name="observations" element="p" parent="quote" rend="keep" attribute="type" value="observation"/>
   <style level="p" name="opener" element="opener" doc="true"/>
   <style level="p" name="p" element="p" rend="keep" doc="true"/>
   <style level="p" name="pb" element="pb" doc="true"/>
@@ -184,6 +186,7 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="p" name="poem" element="lg"/>
   <style level="p" name="postscript" element="p" parent="postscript" doc="true"/>
   <style level="p" name="pre" element="eg"/>
+  <style level="p" name="ps" element="p" parent="postscript"/>
   <style level="p" name="preformattedtext" element="eg"/>
   <style level="p" name="ptop" element="p" rend="keep"/>
   <style level="p" name="q" element="q" doc="true"/>
@@ -208,7 +211,7 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="p" name="signed" element="signed" doc="true"/>
   <style level="p" name="signature" element="signed"/>
   <style level="p" name="soustitre" element="head" attribute="type" value="sub"/>
-  <style level="p" name="speaker"  element="speaker" doc="true"/>
+  <style level="p" name="speaker" element="speaker" doc="true"/>
   <style level="p" name="stage" element="stage" doc="true"/>
   <style level="p" name="stageromain" element="stage" attribute="rend" value="not-i"/>
   <style level="p" name="stageitaliquecourt" element="stage" attribute="rend" value="right"/>  
@@ -229,7 +232,14 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="p" name="syl13" element="l" attribute="met" value="syl13"/>
   <style level="p" name="syl14" element="l" attribute="met" value="syl14"/>
   <style level="p" name="texteenvers" element="l" parent="lg"/>
+  <style level="p" name="textedenotedebasdepage" element="note"/>
   <style level="p" name="term" element="term" parent="index" doc="true"/>
+  <style level="p" name="titre1" element="head" attribute="level" value="1"/>
+  <style level="p" name="titre2" element="head" attribute="level" value="2"/>
+  <style level="p" name="titre3" element="head" attribute="level" value="3"/>
+  <style level="p" name="titre4" element="head" attribute="level" value="4"/>
+  <style level="p" name="titre5" element="head" attribute="level" value="5"/>
+  <style level="p" name="titre6" element="head" attribute="level" value="6"/>
   <style level="p" name="trailer" element="trailer" doc="true"/>
   <style level="p" name="var" element="label" attribute="type" value="variety"/>
   <style level="p" name="vers" element="l"/>
@@ -243,6 +253,7 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="c" name="accentuationforte" element="b"/>
   <style level="c" name="actor" element="actor" doc="true"/>
   <style level="c" name="author" element="author" doc="true"/>
+  <style level="c" name="autregrc" element="foreign" attribute="xml:lang" value="grc"/>
   <style level="c" name="affiliation" element="affiliation" doc="true"/>
   <style level="c" name="age" element="age" doc="true"/>
   <style level="c" name="appelnotedebasdep"/><!-- Delete -->
@@ -275,15 +286,26 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="c" name="example" element="q"/>
   <style level="c" name="exposant" element="sup"/>
   <style level="c" name="foreign" element="foreign"/>
+  <style level="c" name="foreignara" element="foreign" attribute="xml:lang" value="ara"/>
+  <style level="c" name="foreigngrc" element="foreign" attribute="xml:lang" value="grc"/>
+  <style level="c" name="foreignheb" element="foreign" attribute="xml:lang" value="heb"/>
+  <style level="c" name="foreignita" element="foreign" attribute="xml:lang" value="ita"/>
+  <style level="c" name="foreignlat" element="foreign" attribute="xml:lang" value="lat"/>
+  <style level="c" name="foreignper" element="foreign" attribute="xml:lang" value="per"/>
+  <style level="c" name="form" element="form" doc="true"/>
+  <style level="c" name="formula" element="formula" doc="true"/>
+  <style level="c" name="formulachar" element="formula"/>
   <style level="c" name="geogname" element="geogName" doc="true"/>
   <style level="c" name="geographie" element="geogName"/>
   <style level="c" name="gloss" element="gloss" doc="true"/>
+  <style level="c" name="gram" element="gram"/>
   <style level="c" name="htmlcite" element="title"/>
   <style level="c" name="id" element="id"/>
   <style level="c" name="ident" element="ident"/>
   <style level="c" name="idno" element="idno"/>
   <style level="c" name="italic" element="i"/>
   <style level="c" name="italic1" element="i"/>
+  <style level="c" name="italique" element="i"/>
   <style level="c" name="label" element="label" doc="true"/>
   <style level="c" name="lienhypertexte" element="ref"/>
   <style level="c" name="lieninternet" element="ref"/>
@@ -292,18 +314,25 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="c" name="milestone" element="milestone" doc="true"/>
   <style level="c" name="name" element="name" doc="true"/>
   <style level="c" name="num" element="num" doc="true"/>
+  <style level="c" name="orth" element="orth" doc="true"/>
+  <style level="c" name="orthital" element="orth" attribute="rend" value="i"/>
+  <style level="c" name="overline" element="overline"/>
   <style level="c" name="pagenumber" element="num"/>
   <style level="c" name="pagination" element="pb"/>
   <style level="c" name="pagenum" element="pb"/>
   <style level="c" name="pagenum1" element="pb"/>
   <style level="c" name="pb" element="pb" doc="true"/>
   <style level="c" name="persname" element="persName" doc="true"/>
+  <style level="c" name="petitemajusc" element="sc"/>
+  <style level="c" name="ptemajusc" element="sc"/>
+  <style level="c" name="ptemajuscules" element="sc"/>
   <style level="c" name="place" element="placeName"/>
   <style level="c" name="placename" element="placeName" doc="true"/>
   <style level="c" name="q" element="q"/>
   <style level="c" name="quote" element="quote"/>
   <style level="c" name="quotec" element="quote"/>
   <style level="c" name="quotecar" element="quote"/>
+  <style level="c" name="ref" element="ref"/>
   <style level="c" name="refletter" element="ref" attribute="type" value="letter"/>
   <style level="c" name="rswork" element="rs" attribute="type" value="work"/>
   <style level="c" name="s" element="s"/>
@@ -322,7 +351,28 @@ LGPL  http://www.gnu.org/licenses/lgpl.html
   <style level="c" name="teletype" element="code"/>
   <style level="c" name="term" element="term"/>
   <style level="c" name="title" element="title" doc="true"/>
-  <style level="c" name="title0" element="title"/>
+  <style level="c" name="title0"/>
+  <style level="c" name="title1"/>
+  <style level="c" name="title2"/>
+  <style level="c" name="title3"/>
+  <style level="c" name="title4"/>
+  <style level="c" name="title5"/>
+  <style level="c" name="title6"/>
+  <style level="c" name="title7"/>
+  <style level="c" name="title8"/>
+  <style level="c" name="title9"/>
+  <style level="c" name="title10"/>
+  <style level="c" name="titre0"/>
+  <style level="c" name="titre1"/>
+  <style level="c" name="titre2"/>
+  <style level="c" name="titre3"/>
+  <style level="c" name="titre4"/>
+  <style level="c" name="titre5"/>
+  <style level="c" name="titre6"/>
+  <style level="c" name="titre7"/>
+  <style level="c" name="titre8"/>
+  <style level="c" name="titre9"/>
+  <style level="c" name="titre10"/>
   <style level="c" name="titlec" element="title"/>
   <style level="c" name="userentry" element="code"/>
   <style level="c" name="variable" element="term"/>

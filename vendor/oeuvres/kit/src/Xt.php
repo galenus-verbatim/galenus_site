@@ -49,14 +49,15 @@ class Xt
     /**
      * Get a DOM document with best options from a file path
      */
-    public static function load(string $src_file): ?DOMDocument
+    public static function load(string $src_file, ?DOMDocument $DOM = null): ?DOMDocument
     {
         if (!Filesys::readable($src_file)) {
             Log::error("XML file not loaded");
             return null;
         }
-        $DOM = self::DOM();
-        // $DOM->recover=true; // no recover, display errors
+        if (!$DOM) {
+            $DOM = self::DOM();
+        }
         // suspend error reporting, libxml messages are better
         $ret = @$DOM->load($src_file, self::LIBXML_OPTIONS);
         self::logLibxml(libxml_get_errors());
@@ -300,8 +301,15 @@ class Xt
         // add params
         if (isset($pars) && count($pars)) {
             foreach ($pars as $key => $value) {
-                if (!$value) $value = "";
-                $trans->setParameter("", strval($key), strval($value));
+                if (!$value) {
+                    $value = "";
+                }
+                $value = strval($value);
+                // bug: Cannot create XPath expression (string contains both quote and double-quotes)
+                if (strpos($value, '"') !== false && strpos($value, "'") !== false ) {
+                    $value = str_replace("'", "&#39;", $value);
+                }
+                $trans->setParameter("", strval($key), $value);
             }
         }
         // return a DOM document for efficient piping

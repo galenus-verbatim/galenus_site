@@ -397,9 +397,12 @@ class Http
             }
         }
         // GET
-        else {
+        else if (array_key_exists("QUERY_STRING", $_SERVER)) {
             $query = $_SERVER['QUERY_STRING'];
+        } else {
+            $query = "";
         }
+
         // exclude some params
         if (count($exclude)) {
             $query = preg_replace('/&(' . implode('|', $exclude) . ')=[^&]*/', '', '&' . $query);

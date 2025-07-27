@@ -1,8 +1,4 @@
-> You might also like [Nota](https://nota.md/?ref=parsedown-extra) - our Markdown editor for the Desktop.
-
 ## Parsedown Extra
-
-[![Build Status](https://img.shields.io/travis/erusev/parsedown-extra/master.svg?style=flat-square)](https://travis-ci.org/erusev/parsedown-extra)
 
 An extension of [Parsedown](http://parsedown.org) that adds support for [Markdown Extra](https://michelf.ca/projects/php-markdown/extra/).
 
@@ -28,4 +24,8 @@ echo $Extra->text('# Header {.sth}'); # prints: <h1 class="sth">Header</h1>
 
 **How can I help?**
 
-Use it, star it, share it and in case you feel generous, [donate some money](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=528P3NZQMP8N2).
+Use it, star it, share it and in case you feel generous, [donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=528P3NZQMP8N2).
+
+**What else should I know?**
+
+I also make [Nota](https://nota.md/) — a notes app designed for local Markdown files.

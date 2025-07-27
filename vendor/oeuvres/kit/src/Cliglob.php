@@ -13,52 +13,90 @@ use Psr\Log\LogLevel;
 use Oeuvres\Kit\{Filesys, Log};
 use Oeuvres\Kit\Logger\{LoggerCli};
 
-abstract class Cliglob
+class Cliglob
 {
     /** Options */
-    public static $options;
-    /** The source format name */
-    const SRC_FORMAT = self::SRC_FORMAT;
-    /** The prefered source format name */
-    const SRC_EXT = self::SRC_EXT;
-    /** The destination format name */
-    const DST_FORMAT = self::DST_FORMAT;
-    /** A destination extension for generated files */
-    const DST_EXT = self::DST_EXT;
-    /** An optional destination prefix */
-    const DST_PREFIX = "";
+    protected static $options = [];
+    /** Files */
+    protected static $globs;
+
+    /**
+     * Get an option
+     */
+    public static function get(string $name, $default = null)
+    {
+        if (!isset(self::$options[$name])) {
+            return $default;
+        }
+        return self::$options[$name];
+    }
+
+    /**
+     * Set an option
+     */
+    public static function put(string $name, $value):void
+    {
+        self::$options[$name] = $value;
+    }
+
+    /**
+     * Set multiple options
+     */
+    public static function putAll(array $options):void
+    {
+        self::$options = array_merge(self::$options, $options);
+    }
 
     /**
      * Parse command line arguments and process files
      */
-    public static function glob($action)
+    public static function args()
     {
         global $argv;
+        if (isset(self::$globs)) return; 
         $shortopts = "";
         $shortopts .= "h"; // help message
         $shortopts .= "f"; // force transformation
+        $shortopts .= "v"; // verbose messages
         $shortopts .= "d:"; // output directory
         $shortopts .= "t:"; // template file
         $rest_index = null;
-        static::$options = getopt($shortopts, ["io"=>56], $rest_index);
-        $pos_args = array_slice($argv, $rest_index);
-        if (count($pos_args) < 1) {
-            exit(static::help());
+        self::putAll(getopt($shortopts, [], $rest_index));
+        self::$globs = array_slice($argv, $rest_index);
+        if (count(self::$globs) < 1) {
+            exit(self::help());
         }
-        Log::setLogger(new LoggerCli(LogLevel::DEBUG));
+        if (isset(self::$options['v'])) {
+            Log::setLogger(new LoggerCli(LogLevel::DEBUG));
+        }
+        else {
+            Log::setLogger(new LoggerCli(LogLevel::INFO));
+        }
+    }
+    
+    /**
+     * Process files
+     */
+    public static function glob(callable $action)
+    {
+        self::args();
         // loop on arguments to get files of globs
-        foreach ($pos_args as $arg) {
-            $glob = glob($arg);
-            if (count($glob) > 1) {
-                Log::info("=== " . $arg . " ===");
+        foreach (self::$globs as $glob) {
+            $files = glob($glob);
+            if (count($files) > 1) {
+                Log::info("=== " . $glob . " ===");
             }
-            foreach ($glob as $src_file) {
-                $dst_file = static::destination($src_file);
+            foreach ($files as $srcFile) {
+                if (is_dir($srcFile)) continue;
+                if (!Filesys::readable($srcFile)) {
+                    continue;
+                }
+                $dstFile = self::destination($srcFile);
                 // test freshness
-                if (isset(static::$options['f'])); // force
-                else if (!file_exists($dst_file)); // destination not exists
-                else if (filemtime($src_file) < filemtime($dst_file)) continue;
-                $action($src_file, $dst_file);
+                if (isset((self::$options['f']))); // force
+                else if (!file_exists($dstFile)); // destination not exists
+                else if (filemtime($srcFile) < filemtime($dstFile)) continue;
+                $action($srcFile, $dstFile);
             }
         }
     }
@@ -85,8 +123,8 @@ abstract class Cliglob
     {
         list($called) = get_included_files();
         $help = "
-Tranform ".static::SRC_FORMAT." files in ".static::DST_FORMAT."
-    php ".basename($called)." (options)* \"src_dir/*.".static::SRC_EXT."\"
+Tranform " . self::get('src_format')." files in ". self::get('dst_format') ."
+    php ".basename($called)." (options)* \"src_dir/*" . self::get('src_ext') . "\"
 
 PARAMETERS
 globs           : + files or globs
@@ -95,7 +133,8 @@ OPTIONS
 -h              : ? print this help
 -f              : ? force deletion of destination file (no test of freshness)
 -d dst_dir      : ? destination directory for generated files
--t template".static::DST_EXT." : * template files
+-t template     : * template files
+-v              : ? verbose mode
 ";
         return $help;
     }
@@ -103,16 +142,12 @@ OPTIONS
     /**
      * For simple export, default destination file
      */
-    static public function destination($src_file): string
+    static public function destination($srcFile): string
     {
-        if (!isset(static::$options['d'])) {
-            $dst_dir = dirname($src_file) . DIRECTORY_SEPARATOR;
-        } else {
-            $dst_dir = Filesys::normdir(static::$options['d']);
-        }
-        $dst_name =  pathinfo($src_file, PATHINFO_FILENAME);
-        $dst_file = $dst_dir . static::DST_PREFIX . $dst_name . static::DST_EXT;
-        return $dst_file;
+        $dstDir = Filesys::normdir(self::get('d', dirname($srcFile) . DIRECTORY_SEPARATOR));
+        $dstName =  pathinfo($srcFile, PATHINFO_FILENAME);
+        $dstFile = $dstDir . self::get('dst_prefix', '') . $dstName . self::get('dst_ext');
+        return $dstFile;
 
     }
 }

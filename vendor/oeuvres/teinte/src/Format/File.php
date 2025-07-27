@@ -30,6 +30,8 @@ class File
     protected ?int $filemtime;
     /** file size */
     protected ?int $filesize;
+    /** Is it Open OK ? */
+    protected ?bool $open = false;
     /** file content if has been loaded */
     protected ?string $contents = null;
 
@@ -46,13 +48,13 @@ class File
      */
     public function open(string $file): bool
     {
-        $this->contents = null;
-        $this->file = $file;
-        if (!Filesys::readable($file)) {
+        $this->reset();
+        if (!($this->open = Filesys::readable($file))) {
             // Filesys logging
-            $this->reset();
             return false;
         }
+        // relative file path seems OK, even for zip://..\my.docx
+        $this->file = $file;
         $this->filename = pathinfo($file, PATHINFO_FILENAME);
         $this->filemtime = filemtime($file);
         $this->filesize = filesize($file); // ?? if URL ?
@@ -64,6 +66,7 @@ class File
      */
     public function reset():void
     {
+        $this->contents = null;
         $this->filename = null;
         $this->filemtime = null;
         $this->filesize = null;
@@ -145,8 +148,8 @@ class File
     }
 
     /*
-    * Return content if loaded or load it
-    */
+     * Return content if loaded or load it
+     */
     public function contents(): string
     {
         if (!isset($this->file)) {

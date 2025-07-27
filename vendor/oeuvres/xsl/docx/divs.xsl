@@ -108,6 +108,11 @@
 
   <xsl:template match="tei:item/@level"/>
   
+  <xsl:template match="tei:pb">
+    <pb>
+      <xsl:value-of select="normalize-space(.)"/>
+    </pb>
+  </xsl:template>
 
   <xsl:template match="tei:head[@level]">
     <xsl:choose>
@@ -119,7 +124,8 @@
       <xsl:when test="ancestor::tei:table"/>
       <xsl:otherwise>
         <xsl:variable name="level" select="@level"/>
-        <xsl:variable name="prev" select="preceding::tei:head[@level][1]/@level"/>
+        <!-- structuring heading shoul be here at same level -->
+        <xsl:variable name="prev" select="preceding-sibling::tei:head[@level][1]/@level"/>
         <xsl:if test="$prev">
           <xsl:call-template name="tagClose">
             <xsl:with-param name="tag">div</xsl:with-param>
@@ -151,7 +157,9 @@
     </xsl:copy>
   </xsl:template>
   
+  <!--
   <xsl:template match="tei:head/@level"/>
+  -->
 
   <xsl:template name="tagClose">
     <xsl:param name="n"/>
@@ -187,7 +195,8 @@
     <xsl:copy>
       <xsl:apply-templates select="node() | @*"/>
       <xsl:text>&#10;</xsl:text>
-      <xsl:variable name="last" select=".//tei:head[position() = last()]"/>
+      <!-- direct child only, not heads in figures ans so on -->
+      <xsl:variable name="last" select="tei:head[@level][position() = last()]"/>
       <xsl:call-template name="tagClose">
         <xsl:with-param name="tag">div</xsl:with-param>
         <xsl:with-param name="n" select="$last/@level"/>

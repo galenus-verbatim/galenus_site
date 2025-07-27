@@ -1,0 +1,13 @@
+services:
+    web:
+        image: php:8-apache
+        container_name: php-apache-container
+        build:
+            context: .
+            dockerfile_inline: |
+                FROM php:8-apache
+                RUN apt-get -y update && apt-get install -y libicu-dev && docker-php-ext-configure intl && docker-php-ext-install intl
+        ports:
+        - "8088:80"
+        volumes:
+        - .:/var/www/html
