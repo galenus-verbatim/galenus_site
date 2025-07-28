@@ -1,0 +1,16 @@
+{
+  "name": "gv-static",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "BSD-3-Clause",
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "@11ty/eleventy": "^3.1.2"
+  }
+}

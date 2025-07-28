@@ -1,0 +1,109 @@
+---
+selected_page: false
+---
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Galenus Verbatim</title>
+        <link rel="icon" href="data:;base64,iVBORw0KGgo="/>
+        <link  href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" type="text/css" href="/bundle.css" />
+    </head>
+    <body class="{{ body_class }}">
+<header id="header"  class="nav-down">
+    <div class="banner">
+        <div class="titles">
+            <a href="/">
+                <div class="title">Galenus verbatim</div>
+                <div class="titlesub">Γαληνὸς κατὰ λέξιν</div>
+            </a>
+        </div>
+        <div class="moto"><?= I18n::_('template.moto') ?></div>
+        <img class="banner" src="/theme/galenus-verbatim.jpg" />
+    </div>
+</header>
+<div id="all">
+    <div id="content">
+        <nav id="tabs" class="tabs">
+            <a class="tab" href="https://galenus-verbatim.huma-num.fr/">Galenus<br/>Verbatim</a>
+            <form action="/" onsubmit="this.action = this.action + encodeURIComponent(this.cts.value.replaceAll(':', '_'));">
+                <label for="cts"><?= I18n::_('cts.label') ?></label>
+                <br/>
+                <input  id="cts" name="cts"
+                    title="<?= I18n::_('cts.title') ?>"
+                    placeholder="<?= I18n::_('cts.placeholder') ?>"
+                    value="<?= htmlspecialchars($cts) ?>"
+                />
+            </form>
+            {% if selected_page == "opera" %}
+                <a href="/opera" class="tab selected">I18N template.opera</a>
+            {% else %}
+                <a href="/opera" class="tab">I18N template.opera</a>
+            {% endif %}
+
+            <?php
+            if ($page == 'tlg') {
+                // if doc visible, add a buttoon search in doc search in doc
+                Verbatim::qform(true);
+            }
+            // if in concordantia, keep it
+            else if ($page == 'concordantia') {
+                Verbatim::qform(false,  'concordantia');
+            }
+            else {
+                Verbatim::qform();
+            }
+
+            ?>
+
+            {% if selected_page == "titres" %}
+                <a href="/titres" class="tab selected">I18N titres</a>
+            {% else %}
+                <a href="/titres" class="tab">I18N titres</a>
+            {% endif %}
+
+
+            {% if selected_page == "de" %}
+                <a href="/de_en" class="tab selected">I18N template.de</a>
+            {% else %}
+                <a href="/de_en" class="tab">I18N template.de</a>
+            {% endif %}
+
+            {% if selected_page == "novitates" %}
+                <a href="/novitates" class="tab selected">I18N Actualités</a>
+            {% else %}
+                <a href="/novitates" class="tab">I18N Actualités</a>
+            {% endif %}
+
+            <a class="tab zotero" target="_blank" rel="noopener" href="https://www.zotero.org/groups/4571007/galenus-verbatim/library">
+                <span>Ad
+                    <br/>bibliothecam</span>
+                <img height="40px" src="/theme/logo_zotero.png"/>
+            </a>
+        </nav>
+        <div class="container">
+            {{ content }}
+        </div>
+    </div>
+    <footer id="footer">
+        <nav id="logos">
+            <a href="https://www.iufrance.fr/" title="Institut universitaire de France"><img alt="Institut Universitaire de France" src="/theme/logo_IUF.png"/></a>
+
+            <a href="http://www.orient-mediterranee.com/spip.php?rubrique314" title="UMR 8167 Orient et Méditerranée"><img alt="UMR 8167 Orient et Méditerranée" src="/theme/logo_UMR8167.png"/></a>
+
+            <a href="https://lettres.sorbonne-universite.fr/faculte-des-lettres/ufr/lettres/grec/" title="Faculté des Lettres de Sorbonne Université"><img alt="Faculté des Lettres de Sorbonne Université" src="/theme/logo_sorbonne-lettres.png"/></a>
+
+            <a href="https://humanites-biomedicales.sorbonne-universite.fr/" title="Initiative humanités biomédicales de l’Alliance Sorbonne Université"><img alt="Initiative humanités biomédicales de l’Alliance Sorbonne Université" src="/theme/logo_humabiomed.png"/></a>
+
+            <a href="https://documentation.huma-num.fr/hebergement-web/" title="Site hébergé par Huma-Num"><img alt="Site hébergé par Huma-Num" src="/theme/logo_hn.png"/></a>
+
+            <a href="#" onmouseover="this.href='ma'+'i'+'lto:'+'etymologika' + '\u0040gm' + 'ail.com';"><img style="opacity: 0.7;" src="/theme/enveloppe.png"/></a>
+        </nav>
+    </footer>
+</div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.js"></script>
+        <script src="/bundle.js"></script>
+    </body>
+</html>
