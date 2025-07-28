@@ -39,3 +39,8 @@ _*.php
 config.php
 sitemap.xml
 Galenus-verbatim.rdf.xml
+
+
+# 11ty static pages
+node_modules
+_site
