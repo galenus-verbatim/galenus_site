@@ -44,3 +44,4 @@ Galenus-verbatim.rdf.xml
 # 11ty static pages
 node_modules
 _site
+dist

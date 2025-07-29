@@ -1,0 +1,110 @@
+---
+layout: layout.liquid
+selected_page: titres
+---
+    <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-sm border p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Sélection des Titres</h1>
+
+        <!-- Header Controls -->
+        <div class="space-y-4 mb-8">
+            <!-- 1ère ligne -->
+            <div class="flex items-center gap-6 flex-wrap">
+                <!-- Choix déroulant Afficher -->
+                <div class="flex items-center gap-2">
+                    <label for="afficher" class="text-sm font-medium text-gray-700">Afficher :</label>
+                    <select id="afficher" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="tous">Tous les titres</option>
+                        <option value="favoris">Favoris uniquement</option>
+                        <option value="recents">Récents</option>
+                        <option value="non-lus">Non lus</option>
+                    </select>
+                </div>
+
+                <!-- Choix déroulant Trier -->
+                <div class="flex items-center gap-2">
+                    <label for="trier" class="text-sm font-medium text-gray-700">Trier :</label>
+                    <select id="trier" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="alphabetique">Alphabétique</option>
+                        <option value="date">Par date</option>
+                        <option value="popularite">Par popularité</option>
+                        <option value="auteur">Par auteur</option>
+                    </select>
+                </div>
+
+                <!-- Case Tout cocher/décocher -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="tout-cocher" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="tout-cocher" class="text-sm font-medium text-gray-700">Tout cocher/décocher</label>
+                </div>
+
+                <!-- Case Ignorer doublons -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="ignorer-doublons" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="ignorer-doublons" class="text-sm font-medium text-gray-700">Ignorer doublons</label>
+                </div>
+            </div>
+
+            <!-- 2ème ligne -->
+            <div class="flex items-center gap-6 flex-wrap">
+                <!-- Case Gal. -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="gal" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="gal" class="text-sm font-medium text-gray-700">Gal.</label>
+                </div>
+
+                <!-- Case Ps.-Gal. -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="ps-gal" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="ps-gal" class="text-sm font-medium text-gray-700">Ps.-Gal.</label>
+                </div>
+
+                <!-- 8 gommettes -->
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-gray-700">Gommettes :</span>
+                    <div class="flex gap-2">
+                        <button class="w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 transition-colors duration-200 border-2 border-transparent hover:border-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"></button>
+                        <button class="w-6 h-6 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors duration-200 border-2 border-transparent hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"></button>
+                        <button class="w-6 h-6 rounded-full bg-green-500 hover:bg-green-600 transition-colors duration-200 border-2 border-transparent hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"></button>
+                        <button class="w-6 h-6 rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors duration-200 border-2 border-transparent hover:border-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"></button>
+                        <button class="w-6 h-6 rounded-full bg-purple-500 hover:bg-purple-600 transition-colors duration-200 border-2 border-transparent hover:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"></button>
+                        <button class="w-6 h-6 rounded-full bg-pink-500 hover:bg-pink-600 transition-colors duration-200 border-2 border-transparent hover:border-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"></button>
+                        <button class="w-6 h-6 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors duration-200 border-2 border-transparent hover:border-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"></button>
+                        <button class="w-6 h-6 rounded-full bg-gray-500 hover:bg-gray-600 transition-colors duration-200 border-2 border-transparent hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder for title list -->
+        <div class="border-t pt-6">
+            <p class="text-gray-500 text-center py-8">Liste des titres apparaîtra ici...</p>
+        </div>
+    </div>
+
+    <script>
+        // Functionality for "Tout cocher/décocher"
+        document.getElementById('tout-cocher').addEventListener('change', function() {
+            const isChecked = this.checked;
+            // This would typically select/deselect all items in the list
+            console.log('Tout cocher/décocher:', isChecked ? 'coché' : 'décoché');
+        });
+
+        // Functionality for dropdowns
+        document.getElementById('afficher').addEventListener('change', function() {
+            console.log('Affichage changé:', this.value);
+        });
+
+        document.getElementById('trier').addEventListener('change', function() {
+            console.log('Tri changé:', this.value);
+        });
+
+        // Functionality for gommettes (color tags)
+        const gommettes = document.querySelectorAll('.bg-red-500, .bg-blue-500, .bg-green-500, .bg-yellow-500, .bg-purple-500, .bg-pink-500, .bg-orange-500, .bg-gray-500');
+        gommettes.forEach((gommette, index) => {
+            gommette.addEventListener('click', function() {
+                this.classList.toggle('ring-2');
+                this.classList.toggle('ring-offset-2');
+                console.log(`Gommette ${index + 1} clicked`);
+            });
+        });
+    </script>
